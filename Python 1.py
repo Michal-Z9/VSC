@@ -138,9 +138,26 @@ if os.path.exists("os.txt"):
             L.append([x, y])
         
 # Funkcja do automatycznego ustawiania statusu
-def set_status(msg, delay=3000):
+def set_status(msg, delay=1500):
     status_text.set(msg)
-    root.after(delay, lambda: status_text.set("Gotowe"))   
+    root.after(delay, lambda: status_text.set("Gotowe"))
+
+def add_placeholder(entry, placeholder):
+    entry.insert(0, placeholder)
+    entry.config(fg="#F9FF40")
+
+    def on_focus_in(event):
+        if entry.get() == placeholder:
+            entry.delete(0, tk.END)
+            entry.config(fg="#F9FF40")  
+
+    def on_focus_out(event):
+        if entry.get() == "":
+            entry.insert(0, placeholder)
+            entry.config(fg="#9797AB")  
+
+    entry.bind("<FocusIn>", on_focus_in)
+    entry.bind("<FocusOut>", on_focus_out)
 
 # ZAPIS
 def zapisz():
@@ -171,7 +188,7 @@ def czysc():
 def dodaj():
     imie = entry_imie.get()
     numer = entry_numer.get()
-    if imie and numer:
+    if (imie and numer) and (imie!=("Imie") and numer!=("Numer")):
         L.append([imie, numer])
         odswiez()
         entry_imie.delete(0, tk.END)
@@ -195,6 +212,21 @@ def usun():
     except:
         messagebox.showwarning("Błąd", "Zaznacz kontakt!")
         set_status("Błąd: brak zaznaczonego imienia lub numeru")
+
+# Przywróć
+def przyw():
+    try:
+        index = lista.curselection()[0]
+        imie, numer = P[index]
+        if messagebox.askyesno("Przywróć", f"Przywrócić {imie} - {numer}?"):
+            L.append(P[index])
+            del P[index]
+            odswiez()
+            set_status(f"Przywrócono kontakt: {imie} - {numer}")
+    except:
+        messagebox.showwarning("Błąd", "Zaznacz kontakt!")
+        set_status("Błąd: brak zaznaczonego imienia lub numeru")
+        
 
 
 # EDYTUJ
@@ -258,24 +290,35 @@ middle.grid(row=1, column=0, pady=10)
 bottom = tk.Frame(root, bg="#66141D")
 bottom.grid(row=2, column=0, pady=10)
 
-
-
-# LISTA
+#SCROL BAR
+list_frame = tk.Frame(top, bg="#1A6466")
+list_frame.pack(fill="both", expand=True)
 lista = tk.Listbox(top, width=60, height=15, bg="#1A6466", fg="#F9FF40")
-lista.pack()
+
+
+scrollbar = tk.Scrollbar(list_frame)
+scrollbar.pack(side="right", fill="y")
+
+lista = tk.Listbox(list_frame, width=60, height=15, bg="#1A6466", fg="#F9FF40",
+                   yscrollcommand=scrollbar.set)
+lista.pack(side="left", fill="both", expand=True)
+
+scrollbar.config(command=lista.yview)
+
+
 
 # POLA
 entry_imie = tk.Entry(middle, bg="#1A6466", fg="#F9FF40")
 entry_imie.grid(row=0, column=0, padx=5)
-entry_imie.insert(0, "Imię")
+add_placeholder(entry_imie, "Imię")
 
 entry_numer = tk.Entry(middle, bg="#1A6466", fg="#F9FF40")
 entry_numer.grid(row=0, column=1, padx=5)
-entry_numer.insert(0, "Numer")
+add_placeholder(entry_numer, "Numer")
 
 entry_szukaj = tk.Entry(middle, bg="#1A6466", fg="#F9FF40")
 entry_szukaj.grid(row=1, column=0, columnspan=2, pady=5)
-entry_szukaj.insert(0, "Szukaj imie")
+add_placeholder(entry_szukaj, "Szukaj imie")
 
 # PRZYCISKI
 tk.Button(bottom, text="Dodaj", command=dodaj, bg="#1A6466", fg="#F9FF40").grid(row=0, column=0, padx=4)
@@ -285,7 +328,9 @@ tk.Button(bottom, text="Czyść", command=czysc, bg="#1A6466", fg="#F9FF40").gri
 tk.Button(bottom, text="Kosz", command=kosz, bg="#1A6466", fg="#F9FF40").grid(row=0, column=4, padx=4)
 tk.Button(bottom, text="Cofnij", command=cofnij, bg="#1A6466", fg="#F9FF40").grid(row=0, column=5, padx=4)
 tk.Button(bottom, text="Odśwież", command=odswiez, bg="#1A6466", fg="#F9FF40").grid(row=0, column=6, padx=4)
+tk.Button(bottom, text="Przywróć", command=przyw, bg="#1A6466", fg="#F9FF40").grid(row=0, column=6, padx=4)
 
+# STATUS BAR
 status_text = tk.StringVar()
 status_text.set("Gotowe")
 
@@ -295,6 +340,7 @@ status_frame.grid(row=3, column=0, sticky="we")
 status_bar = tk.Label(status_frame, textvariable=status_text, bg="#1A6466", fg="#F9FF40", anchor="w", padx=10)
 status_bar.pack(fill="x")
 
+# ZAPISYWANIE
 def zamknij():
     zapisz()
     root.destroy()
