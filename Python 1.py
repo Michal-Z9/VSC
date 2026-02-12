@@ -142,6 +142,9 @@ def set_status(msg, delay=1500):
     status_text.set(msg)
     root.after(delay, lambda: status_text.set("Gotowe"))
 
+
+# PLACE HOLDER
+
 def add_placeholder(entry, placeholder):
     entry.insert(0, placeholder)
     entry.config(fg="#F9FF40")
@@ -255,7 +258,7 @@ def szukaj():
     for i, (x, y) in enumerate(L):
         if szukane in x.lower():
             lista.insert(tk.END, f"{i+1}. {x} - {y}")
-            set_status(f"Wyszukano kontakt: {imie} - {numer}")
+            set_status(f"Wyszukano kontakt: {x} - {y}")
 #Kosz
 def kosz():
     lista.delete(0, tk.END)
@@ -273,6 +276,33 @@ def cofnij():
         set_status(f"Przywrócono kontakty")
 
 
+# KEY BIND shortcuty
+
+def shortcut_dodaj(event):
+    dodaj()
+def shortcut_edytuj(event):
+    edytuj()
+def shortcut_usun(event):
+    usun()
+def shortcut_czysc(event):
+    czysc()        
+def shortcut_kosz(event):
+    kosz()
+def shortcut_cofnij(event):
+    cofnij()        
+def shortcut_odswiez(event):
+    odswiez()
+def shortcut_przyw(event):
+    przyw()
+def shortcut_szukaj(event):
+    szukaj()
+
+
+
+    
+##---------------------------------------------------
+##///////////////////////////////////////////////////
+    
 # OKNO
 root = tk.Tk()
 root.configure(bg="#66141D")
@@ -322,13 +352,14 @@ add_placeholder(entry_szukaj, "Szukaj imie")
 
 # PRZYCISKI
 tk.Button(bottom, text="Dodaj", command=dodaj, bg="#1A6466", fg="#F9FF40").grid(row=0, column=0, padx=4)
-tk.Button(bottom, text="Edytuj", command=edytuj,bg="#1A6466", fg="#F9FF40").grid(row=0, column=1, padx=4)
-tk.Button(bottom, text="Usuń", command=usun, bg="#1A6466", fg="#F9FF40").grid(row=0, column=2, padx=4)
-tk.Button(bottom, text="Czyść", command=czysc, bg="#1A6466", fg="#F9FF40").grid(row=0, column=3, padx=4)
-tk.Button(bottom, text="Kosz", command=kosz, bg="#1A6466", fg="#F9FF40").grid(row=0, column=4, padx=4)
+tk.Button(bottom, text="Edytuj", command=edytuj,bg="#1A6466", fg="#F9FF40").grid(row=0, column=2, padx=4)
+tk.Button(bottom, text="Usuń", command=usun, bg="#1A6466", fg="#F9FF40").grid(row=0, column=1, padx=4)
+tk.Button(bottom, text="Czyść", command=czysc, bg="#1A6466", fg="#F9FF40").grid(row=0, column=4, padx=4)
+tk.Button(bottom, text="Kosz", command=kosz, bg="#1A6466", fg="#F9FF40").grid(row=0, column=7, padx=4)
 tk.Button(bottom, text="Cofnij", command=cofnij, bg="#1A6466", fg="#F9FF40").grid(row=0, column=5, padx=4)
-tk.Button(bottom, text="Odśwież", command=odswiez, bg="#1A6466", fg="#F9FF40").grid(row=0, column=6, padx=4)
+tk.Button(bottom, text="Odśwież", command=odswiez, bg="#1A6466", fg="#F9FF40").grid(row=0, column=8, padx=4)
 tk.Button(bottom, text="Przywróć", command=przyw, bg="#1A6466", fg="#F9FF40").grid(row=0, column=6, padx=4)
+tk.Button(bottom, text="Szukaj", command=szukaj, bg="#1A6466", fg="#F9FF40").grid(row=0, column=3, padx=4)
 
 # STATUS BAR
 status_text = tk.StringVar()
@@ -340,6 +371,18 @@ status_frame.grid(row=3, column=0, sticky="we")
 status_bar = tk.Label(status_frame, textvariable=status_text, bg="#1A6466", fg="#F9FF40", anchor="w", padx=10)
 status_bar.pack(fill="x")
 
+#KEY BIND
+root.bind("<Return>", shortcut_dodaj)
+root.bind("<Control-u>", shortcut_usun)
+root.bind("<Control-e>", shortcut_edytuj)
+root.bind("<Control-c>", shortcut_czysc)
+root.bind("<Control-r>", shortcut_cofnij)
+root.bind("<Control-p>", shortcut_przyw)
+root.bind("<Control-k>", shortcut_kosz)
+root.bind("<Control-o>", shortcut_odswiez)
+root.bind("<Control-f>", shortcut_szukaj)
+
+          
 # ZAPISYWANIE
 def zamknij():
     zapisz()
